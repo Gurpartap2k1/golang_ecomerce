@@ -1,0 +1,15 @@
+# Environment
+.env
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Binaries
+bin/
