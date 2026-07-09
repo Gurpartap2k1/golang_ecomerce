@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -29,18 +29,24 @@ func main() {
 	slog.SetDefault(logger)
 
 	//Database
-	conn, err := pgx.Connect(ctx, cfg.db.dsn)
+
+	pool, err := pgxpool.New(ctx, cfg.db.dsn)
 	if err != nil {
-		panic(err)
+		slog.Error(
+			"failed to connect to database",
+			"error", err,
+		)
+
+		os.Exit(1)
 	}
 
-	defer conn.Close(ctx)
+	defer pool.Close()
 
 	logger.Info("Connected to Database", "dsn", cfg.db.dsn)
 
 	api := application{
 		config: cfg,
-		db:     conn,
+		db:     pool,
 		jwt:    jwtManager,
 	}
 

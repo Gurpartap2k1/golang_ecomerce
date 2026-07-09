@@ -6,6 +6,7 @@ import (
 	repo "gary/ecom/internal/adapters/postgres/sqlc"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,11 +22,11 @@ type Service interface {
 
 type svc struct {
 	repo *repo.Queries
-	db   *pgx.Conn
+	db   *pgxpool.Pool
 	jwt  *JwtManager
 }
 
-func NewService(repo *repo.Queries, db *pgx.Conn, jwt *JwtManager) Service {
+func NewService(repo *repo.Queries, db *pgxpool.Pool, jwt *JwtManager) Service {
 	return &svc{
 		repo: repo,
 		db:   db,
