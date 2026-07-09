@@ -2,6 +2,7 @@ package main
 
 import (
 	repo "gary/ecom/internal/adapters/postgres/sqlc"
+	"gary/ecom/internal/auth"
 	"gary/ecom/internal/orders"
 	"gary/ecom/internal/products"
 	"log"
@@ -30,15 +31,24 @@ func (app *application) mount() http.Handler {
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("healthy"))
 	})
+	//products
 	productService := products.NewService(repo.New(app.db))
 	productHandler := products.NewHandler(productService)
-	r.Get("/product/{id}", productHandler.ListProductById)
-	r.Get("/products", productHandler.ListProducts)
+	products.RegisterRoutes(r, productHandler)
 
 	//orders
 	orderService := orders.NewService(repo.New(app.db), app.db)
 	orderHandler := orders.NewHandler(orderService)
-	r.Post("/orders", orderHandler.PlaceOrder)
+	//protected using auth middleware
+	r.Group(func(r chi.Router) {
+		r.Use(app.jwt.Authenticate)
+		orders.RegisterRoutes(r, orderHandler)
+	})
+
+	//auth
+	authService := auth.NewService(repo.New(app.db), app.db, app.jwt)
+	authHandler := auth.NewHandler(authService)
+	auth.RegisterRoutes(r, authHandler)
 
 	return r
 }
@@ -60,6 +70,7 @@ func (app *application) run(h http.Handler) error {
 type application struct {
 	config config
 	db     *pgx.Conn
+	jwt    *auth.JwtManager
 }
 
 type config struct {
@@ -67,6 +78,12 @@ type config struct {
 	addr string
 	//database configuration
 	db dbconfig
+
+	jwt jwtConfig
+}
+
+type jwtConfig struct {
+	secret string
 }
 
 type dbconfig struct {

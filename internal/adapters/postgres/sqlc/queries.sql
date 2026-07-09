@@ -19,3 +19,21 @@ INSERT INTO orders (
 -- name: CreateOrderItem :one
 INSERT INTO order_items (order_id, product_id, quantity, price)
 VALUES ($1, $2, $3, $4) RETURNING *;
+
+-- name: CreateUser :one
+INSERT INTO users (email, password_hash)
+VALUES ($1, $2) RETURNING *;
+
+-- name: GetUserByEmail :one
+SELECT
+*
+FROM
+users
+WHERE email = $1;
+
+-- name: GetUserById :one
+SELECT
+*
+FROM
+users
+WHERE id = $1;

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"gary/ecom/internal/auth"
 	"gary/ecom/internal/env"
 	"log/slog"
 	"os"
@@ -17,7 +18,11 @@ func main() {
 		db: dbconfig{
 			dsn: env.GetString("GOOSE_DBSTRING", "host=localhost user=postgres password=postgres dbname=ecom sslmode=disable"),
 		},
+		jwt: jwtConfig{
+			secret: env.GetString("JWT_SECRET", "my-super-secret-jwt-string-for-authentication"),
+		},
 	}
+	jwtManager := auth.NewJwtManager(cfg.jwt.secret)
 
 	//logger with slog
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -36,6 +41,7 @@ func main() {
 	api := application{
 		config: cfg,
 		db:     conn,
+		jwt:    jwtManager,
 	}
 
 	if err := api.run(api.mount()); err != nil {
