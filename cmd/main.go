@@ -4,6 +4,7 @@ import (
 	"context"
 	"gary/ecom/internal/auth"
 	"gary/ecom/internal/env"
+	"gary/ecom/internal/pkg/logger"
 	"log/slog"
 	"os"
 
@@ -24,10 +25,6 @@ func main() {
 	}
 	jwtManager := auth.NewJwtManager(cfg.jwt.secret)
 
-	//logger with slog
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
-
 	//Database
 
 	pool, err := pgxpool.New(ctx, cfg.db.dsn)
@@ -42,10 +39,9 @@ func main() {
 
 	defer pool.Close()
 
-	logger.Info("Connected to Database", "dsn", cfg.db.dsn)
-
 	api := application{
 		config: cfg,
+		logger: logger.New(),
 		db:     pool,
 		jwt:    jwtManager,
 	}

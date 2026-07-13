@@ -3,11 +3,10 @@ module gary/ecom
 go 1.26.4
 
 require (
-	github.com/go-chi/chi v1.5.5
-	github.com/go-chi/chi/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	golang.org/x/sync v0.21.0 // indirect
 )
-
-require github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

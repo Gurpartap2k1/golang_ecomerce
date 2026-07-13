@@ -1,9 +1,9 @@
 package orders
 
-import "github.com/go-chi/chi/v5"
+import (
+	"net/http"
+)
 
-func RegisterRoutes(r chi.Router, h *Handler) {
-	r.Route("/orders", func(r chi.Router) {
-		r.Post("/", h.PlaceOrder)
-	})
+func RegisterRoutes(mux *http.ServeMux, h *Handler, auth func(http.Handler) http.Handler) {
+	mux.Handle("POST /orders", auth(http.HandlerFunc(h.PlaceOrder)))
 }

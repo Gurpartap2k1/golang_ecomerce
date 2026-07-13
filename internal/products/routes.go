@@ -1,10 +1,10 @@
 package products
 
-import "github.com/go-chi/chi/v5"
+import (
+	"net/http"
+)
 
-func RegisterRoutes(r chi.Router, h *Handler) {
-	r.Route("/products", func(r chi.Router) {
-		r.Get("/", h.ListProducts)
-		r.Get("/{id}", h.ListProductById)
-	})
+func RegisterRoutes(mux *http.ServeMux, h *Handler) {
+	mux.HandleFunc("/products", h.ListProducts)
+	mux.HandleFunc("/products/{id}", h.ListProductById)
 }
